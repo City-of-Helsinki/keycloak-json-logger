@@ -21,6 +21,6 @@ Step 2: In Keycloak Admin UI, go to the Events left menu item and select the Con
 
 **Logger settings**
 
-By default, after deployment, Keycloak json logger uses the root-logger defined in Keycloak's standalone.xml (see <root-logger> there).
+By default, after deployment, keycloak_json_logger uses the root-logger defined in Keycloak's standalone.xml, which logs into 'server.log' file in $KEYCLOAK_DIR/standalone/logs folder.
   
 MORE TO BE WRITTEN (UNDER CONSTRUCTION)
