@@ -12,13 +12,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import javax.json.*;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.UriInfo;
 
 public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 
-    KeycloakSession session;
-    Logger loggerLoginEvents;
-	Logger loggerAdminEvents;
-	SimpleDateFormat dateTimeFormatter;
+    private final KeycloakSession session;
+    private final Logger loggerLoginEvents;
+	private final Logger loggerAdminEvents;
+	private final SimpleDateFormat dateTimeFormatter;
 
 
 	public JsonLoggingEventListenerProvider(KeycloakSession session, Logger loggerLoginEvents, Logger loggerAdminEvents) {
@@ -94,10 +97,23 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
         if (event.getDetails() != null) {
 			JsonObjectBuilder objDetails  = Json.createObjectBuilder();
             for (Map.Entry<String, String> e : event.getDetails().entrySet()) {
-                objDetails.add(e.getKey(), e.getValue().toString());
+				
+				// Because of GDPR, we may not want to log username (=email) to Centralized audit log (Elastic cloud)
+				if (e.getKey() == "username" || e.getKey() == "identity_provider_identity")
+					objDetails.add(e.getKey(), "Username not logged on purpose");
+				else
+					objDetails.add(e.getKey(), e.getValue().toString());
             }
 			obj.add("details", objDetails.build());
         }
+		
+		AuthenticationSessionModel authSession = session.getContext().getAuthenticationSession(); 
+        if(authSession!=null) {
+			obj.add("authentication_session_parent_id", authSession.getParentSession().getId());
+            obj.add("authentication_session_tab_id", authSession.getTabId());
+        }
+		
+		//setKeycloakContext(obj);
 		
 		JsonObjectBuilder objRoot = Json.createObjectBuilder();
 		
@@ -154,10 +170,29 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
         if (adminEvent.getError() != null) {
             obj.add("error", adminEvent.getError().toString());
         }
+		
+		//setKeycloakContext(obj);
 
 		JsonObjectBuilder objRoot = Json.createObjectBuilder();
 		
         return objRoot.add("keycloak_admin_event", obj.build()).build().toString();
+    }
+	
+	private void setKeycloakContext(JsonObjectBuilder obj) {
+        KeycloakContext context = session.getContext();
+        UriInfo uriInfo = context.getUri();
+        HttpHeaders headers = context.getRequestHeaders();
+        if (uriInfo != null) {
+			obj.add("request_uri", uriInfo.getRequestUri().toString());
+        }
+
+        if (headers != null) {		
+			JsonArrayBuilder cookieArray = Json.createArrayBuilder();
+            for (Map.Entry<String, Cookie> e : headers.getCookies().entrySet()) {
+                cookieArray.add(e.getValue().toString());
+            }	
+			obj.add("cookies", cookieArray.build());
+        }  
     }
 
 }
