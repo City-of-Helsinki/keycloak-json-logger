@@ -1,4 +1,4 @@
-package helsinki.profile.keycloak.jsonloggerprovider.provider;
+package helsinki.profile.keycloak.events.log;
 
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
@@ -9,7 +9,7 @@ import org.keycloak.models.KeycloakSessionFactory;
 
 
 
-public class JsonLoggerProviderFactory implements EventListenerProviderFactory {
+public class JsonLoggingEventListenerProviderFactory implements EventListenerProviderFactory {
 
     private static final Logger loggerLoginEvents = Logger.getLogger("org.keycloak.events.Event");
 	private static final Logger loggerAdminEvents = Logger.getLogger("org.keycloak.events.admin.AdminEvent");
@@ -18,7 +18,7 @@ public class JsonLoggerProviderFactory implements EventListenerProviderFactory {
     @Override
     public EventListenerProvider create(KeycloakSession session) {
 
-		return new JsonLoggerProvider(session, loggerLoginEvents, loggerAdminEvents);
+		return new JsonLoggingEventListenerProvider(session, loggerLoginEvents, loggerAdminEvents);
     }
 
     @Override

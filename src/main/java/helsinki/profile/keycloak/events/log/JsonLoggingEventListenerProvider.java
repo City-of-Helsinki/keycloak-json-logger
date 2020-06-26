@@ -1,4 +1,4 @@
-package helsinki.profile.keycloak.jsonloggerprovider.provider;
+package helsinki.profile.keycloak.events.log;
 
 import org.jboss.logging.Logger;
 import org.keycloak.events.Event;
@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.Map;
 import javax.json.*;
 
-public class JsonLoggerProvider implements EventListenerProvider {
+public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 
     KeycloakSession session;
     Logger loggerLoginEvents;
@@ -21,7 +21,7 @@ public class JsonLoggerProvider implements EventListenerProvider {
 	SimpleDateFormat dateTimeFormatter;
 
 
-	public JsonLoggerProvider(KeycloakSession session, Logger loggerLoginEvents, Logger loggerAdminEvents) {
+	public JsonLoggingEventListenerProvider(KeycloakSession session, Logger loggerLoginEvents, Logger loggerAdminEvents) {
         this.session = session;
 		this.loggerLoginEvents = loggerLoginEvents;
 		this.loggerAdminEvents = loggerAdminEvents;

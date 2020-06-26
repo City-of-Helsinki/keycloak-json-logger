@@ -1,1 +1,1 @@
-helsinki.profile.keycloak.jsonloggerprovider.provider.JsonLoggerProviderFactory
+helsinki.profile.keycloak.events.log.JsonLoggingEventListenerProviderFactory
