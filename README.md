@@ -1,0 +1,1 @@
+Custom Keycloak Event Listener for logging (outputting) Login events and Admin events in JSON format
