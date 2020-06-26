@@ -15,6 +15,7 @@ PROTOTYPE ONLY at this point.
 **Keycloak deployment (standalone mode)**
 
 Step 1: Copy keycloack-json-logger.jar into $KEYCLOAK_DIR/standalone/deployments
+
 Step 2: In Keycloak Admin UI, go to the Events left menu item and select the Config tab, and add 'keycloak_json_logger' to Event listeners config
 - Note, that settings for saving login events and admin events to Keycloak database have no dependecy to Event Listeners config.
 
