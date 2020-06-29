@@ -27,14 +27,16 @@ Keycloak_json_logger use org.jboss.loggin.Logger, configured in Keycloak's stand
 
 Furthermore, by default, the root-logger formats each log line so that there are timestamp, loglevel, etc. information in front of actual json message, which means that Filebeat's automatic JSON decoding cannot be used.
 
-Example default log line in server.log
-```
+Example default logging into server.log -file
+``` 
 2020-06-29 09:08:44,457 INFO  [org.keycloak.events.Event] (default task-1) {"keycloak_login_event":{"date_time_epoch":1593410924440,"date_time":"2020-06-29T09:08:44.440Z","type":"LOGIN","realm":"local-dev","client_id":"account","user_id":"ccad2aaa-d7ea-46fc-b91d-d37c95c4f9bb","ip_address":"127.0.0.1","session_id":"8b0123aa-b223-4f93-a415-6fa29e5beede","details":{"identity_provider":"github","redirect_uri":"http://localhost:8080/auth/realms/local-dev/account/login-redirect","consent":"no_consent_required","identity_provider_identity":"Username not logged on purpose","code_id":"8b0123aa-b223-4f93-a415-6fa29e5beede","username":"Username not logged on purpose"},"authentication_session_parent_id":"8b0123aa-b223-4f93-a415-6fa29e5beede","authentication_session_tab_id":"4cISlfSEfwI"}}
 ```
 
+
 ***Logging event to their own file and json only***
 
-``` Example standalone.xml
+Example standalone.xml configuration to log JSON only to its own file.
+```
 <subsystem xmlns="urn:jboss:domain:logging:8.0">
 .....
   <periodic-rotating-file-handler name="KEYCLOAK-LOGIN-EVENTS-FILE" autoflush="true">
