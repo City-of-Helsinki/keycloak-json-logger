@@ -36,7 +36,7 @@ Example default logging into server.log -file
 ***Logging event to their own file and json only***
 
 Example standalone.xml configuration to log JSON only to its own file.
-
+```
 <subsystem xmlns="urn:jboss:domain:logging:8.0">
   <periodic-rotating-file-handler name="KEYCLOAK-LOGIN-EVENTS-FILE" autoflush="true">
     <formatter>
@@ -69,5 +69,5 @@ Example standalone.xml configuration to log JSON only to its own file.
   <formatter name="MESSAGE-ONLY">
     <pattern-formatter pattern="%s%e%n"/>
   </formatter>
-
+```
 
