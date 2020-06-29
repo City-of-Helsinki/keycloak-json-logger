@@ -36,9 +36,8 @@ Example default logging into server.log -file
 ***Logging event to their own file and json only***
 
 Example standalone.xml configuration to log JSON only to its own file.
-```
+
 <subsystem xmlns="urn:jboss:domain:logging:8.0">
-.....
   <periodic-rotating-file-handler name="KEYCLOAK-LOGIN-EVENTS-FILE" autoflush="true">
     <formatter>
       <named-formatter name="MESSAGE-ONLY"/>
@@ -55,7 +54,6 @@ Example standalone.xml configuration to log JSON only to its own file.
      <suffix value=".yyyy-MM-dd"/>
     <append value="false"/>
   </periodic-rotating-file-handler>
-  .....
   <logger category="org.keycloak.events.Event" use-parent-handlers="false">
     <level name="INFO"/>
       <handlers>
@@ -68,9 +66,8 @@ Example standalone.xml configuration to log JSON only to its own file.
       <handler name="KEYCLOAK-ADMIN-EVENTS-FILE"/>
     </handlers>
   </logger>
-  ....
   <formatter name="MESSAGE-ONLY">
     <pattern-formatter pattern="%s%e%n"/>
   </formatter>
-```
+
 
