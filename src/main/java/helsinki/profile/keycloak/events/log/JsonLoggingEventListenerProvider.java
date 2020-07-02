@@ -55,18 +55,48 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 
     @Override
     public void close() {
-
+		
     }
 
     private String toString(Event event) {
 		
 		JsonObjectBuilder obj = Json.createObjectBuilder();
 		
-		obj.add("category", "LoginEvent");
+		obj.add("category", "LOGIN_EVENT");
 		
         obj.add("date_time_epoch", event.getTime());
 		
 		obj.add("date_time", dateTimeFormatter.format(new java.util.Date(event.getTime())));
+		
+		JsonObjectBuilder objActorUser = Json.createObjectBuilder();
+		objActorUser.add("role", "owner");
+		String userId = "";
+		String userName = "";
+		if (event.getUserId() != null) {
+            userId = event.getUserId().toString();
+			userName = "not_logged_on_purpose";
+		}
+        objActorUser.add("user_id", userId);
+		objActorUser.add("user_name", userName);
+		String realm = "";
+		if (event.getRealmId() != null)
+			realm = event.getRealmId();
+		objActorUser.add("realm", realm);
+		obj.add("actor_user", objActorUser.build());
+		
+		JsonObjectBuilder objTargetUser = Json.createObjectBuilder();
+		userId = "";
+		if (event.getUserId() != null) {
+            userId = event.getUserId().toString();
+			userName = "not_logged_on_purpose";
+		}
+        objTargetUser.add("user_id", userId);
+		objTargetUser.add("user_name", userName);
+		realm = "";
+		if (event.getRealmId() != null)
+			realm = event.getRealmId();
+		objTargetUser.add("realm", realm);
+		obj.add("target_user", objTargetUser.build());
 		
 		if (event.getType() != null) {
 			obj.add("type", event.getType().toString());
@@ -102,7 +132,7 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 				
 				// Because of GDPR, we may not want to log username (=email) to Centralized audit log (Elastic cloud)
 				if (e.getKey() == "username" || e.getKey() == "identity_provider_identity")
-					objDetails.add(e.getKey(), "Username not logged on purpose");
+					objDetails.add(e.getKey(), "not_logged_on_purpose");
 				else
 					objDetails.add(e.getKey(), e.getValue().toString());
             }
@@ -128,10 +158,47 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 
 		JsonObjectBuilder obj = Json.createObjectBuilder();
 		
-		obj.add("category", "AdminEvent");
+		if (adminEvent.getResourcePath() != null && adminEvent.getResourcePath().startsWith("users/"))
+			obj.add("category", "ADMIN_EVENT_USER"); // Keycloak admin event whose target is a user
+		else
+			obj.add("category", "ADMIN_EVENT_OTHER");  // Keycloak admin event whose target is not a user
 		
         obj.add("date_time_epoch", adminEvent.getTime());
 		obj.add("date_time", dateTimeFormatter.format(new java.util.Date(adminEvent.getTime())));
+		
+		JsonObjectBuilder objActorUser = Json.createObjectBuilder();
+		objActorUser.add("role", "admin");
+		String userId = "";
+		String userName = "";
+		if (adminEvent.getAuthDetails().getUserId() != null) {
+            userId = adminEvent.getAuthDetails().getUserId().toString();
+			userName = "not_logged_on_purpose";
+		}
+        objActorUser.add("user_id", userId);
+		objActorUser.add("user_name", userName);
+		String realm = "";
+		if (adminEvent.getAuthDetails().getRealmId() != null)
+			realm = adminEvent.getAuthDetails().getRealmId();
+		objActorUser.add("realm", realm);
+		obj.add("actor_user", objActorUser.build());
+		
+		JsonObjectBuilder objTargetUser = Json.createObjectBuilder();
+		userId = "";
+		userName = "";
+		if (adminEvent.getResourcePath() != null && adminEvent.getResourcePath().startsWith("users/")) { 
+			 try {
+				 String[] resourcePathSplit = adminEvent.getResourcePath().split("/");
+				 userId = resourcePathSplit[1];
+				 userName = "not_logged_on_purpose";
+			 } catch (Exception e) {}
+		}
+        objTargetUser.add("user_id", userId);
+		objTargetUser.add("user_name", userName);
+		realm = "";
+		if (adminEvent.getRealmId() != null)
+			realm =  adminEvent.getRealmId();
+		objTargetUser.add("realm", realm);
+		obj.add("target_user", objTargetUser.build());
 
         obj.add("type", "ADMIN_EVENT");
 
@@ -169,6 +236,10 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 
         if (adminEvent.getResourcePath() != null) {
             obj.add("resource_path", adminEvent.getResourcePath().toString());
+        }
+		
+		if (adminEvent.getRealmId() != null) {
+            obj.add("resource_realm", adminEvent.getRealmId().toString());
         }
 
         if (adminEvent.getError() != null) {
