@@ -62,6 +62,8 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 		
 		JsonObjectBuilder obj = Json.createObjectBuilder();
 		
+		obj.add("category", "LoginEvent");
+		
         obj.add("date_time_epoch", event.getTime());
 		
 		obj.add("date_time", dateTimeFormatter.format(new java.util.Date(event.getTime())));
@@ -117,7 +119,7 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 		
 		JsonObjectBuilder objRoot = Json.createObjectBuilder();
 		
-        return objRoot.add("keycloak_login_event", obj.build()).build().toString();
+        return objRoot.add("keycloak_event", obj.build()).build().toString();
 
     }
 
@@ -125,6 +127,8 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
     private String toString(AdminEvent adminEvent) {
 
 		JsonObjectBuilder obj = Json.createObjectBuilder();
+		
+		obj.add("category", "AdminEvent");
 		
         obj.add("date_time_epoch", adminEvent.getTime());
 		obj.add("date_time", dateTimeFormatter.format(new java.util.Date(adminEvent.getTime())));
@@ -175,7 +179,7 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 
 		JsonObjectBuilder objRoot = Json.createObjectBuilder();
 		
-        return objRoot.add("keycloak_admin_event", obj.build()).build().toString();
+        return objRoot.add("keycloak_event", obj.build()).build().toString();
     }
 	
 	private void setKeycloakContext(JsonObjectBuilder obj) {
