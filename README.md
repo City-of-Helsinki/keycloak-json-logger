@@ -23,7 +23,7 @@ Step 2: In Keycloak Admin UI, go to the Events left menu item and select the Con
 
 ***Logging with default settings***
 
-Keycloak_json_logger use org.jboss.loggin.Logger, configured in Keycloak's standalone.xml )or standalone-ha.xml) configuration file. By default, after deployment, it uses "root-logger" and logs to both to console (stdout) and to  'server.log' file in $KEYCLOAK_DIR/standalone/logs folder.
+Keycloak_json_logger uses org.jboss.loggin.Logger, configured in Keycloak's standalone.xml (or standalone-ha.xml) configuration file. By default, after deployment,"root-logger" is used and it logs to both to console (stdout) and to  'server.log' file in $KEYCLOAK_DIR/standalone/logs folder.
 
 Furthermore, by default, the root-logger formats each log line so that there are timestamp, loglevel, etc. information in front of actual json message, which means that Filebeat's automatic JSON decoding cannot be used.
 
@@ -33,7 +33,40 @@ Example default logging into server.log -file (and to console)
 ```
 
 
-***Logging events as json only***
+***Configuration for outputting event log to console (stdout), json message only***
+
+This is valid, usable configuration if Keycloak runs in Docker container and Filebeat will be setup with `container` input (Filebeat reading container log files).
+```
+standalone.xml (standalone-ha.xml)
+....
+<subsystem xmlns="urn:jboss:domain:logging:8.0">
+.....
+  <console-handler name="CONSOLE-EVENTS">
+    <level name="INFO"/>
+    <formatter>
+      <named-formatter name="MESSAGE-ONLY"/>
+    </formatter>
+  </console-handler>
+  <logger category="org.keycloak.events.Event" use-parent-handlers="false">
+    <level name="INFO"/>
+    <handlers>
+      <handler name="CONSOLE-EVENTS"/>
+    </handlers>
+  </logger>
+  <logger category="org.keycloak.events.admin.AdminEvent" use-parent-handlers="false">
+    <level name="INFO"/>
+    <handlers>
+      <handler name="CONSOLE-EVENTS"/>
+		</handlers>
+  </logger>
+  ....
+  <formatter name="MESSAGE-ONLY">
+    <pattern-formatter pattern="%s%e%n"/>
+  </formatter>
+  ````
+
+
+***Configuration for outputting event log to their own files, json messages only***
 
 Example standalone.xml configuration to log JSON only and both Login events and Admin events to their own files
 ```
