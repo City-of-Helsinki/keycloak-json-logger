@@ -63,4 +63,7 @@ standalone.xml (standalone-ha.xml)
     <pattern-formatter pattern="%s%e%n"/>
   </formatter>
  ```
-
+Example console (stdout) output with log configuration above
+```
+{"keycloak_event":{"category":"LOGIN_EVENT","date_time_epoch":1593775257302,"date_time":"2020-07-03T11:20:57.302Z","actor_user":{"role":"owner","user_id":"327f2cb1-0180-4a9e-9923-0347dbd31b25","user_name":"not_logged_on_purpose","realm":"local-dev"},"target_user":{"user_id":"327f2cb1-0180-4a9e-9923-0347dbd31b25","user_name":"not_logged_on_purpose","realm":"local-dev"},"type":"LOGIN","realm":"local-dev","client_id":"account","user_id":"327f2cb1-0180-4a9e-9923-0347dbd31b25","ip_address":"172.17.0.1","session_id":"1412873b-8830-4e83-ae46-4ca63512a3e2","details":{"auth_method":"openid-connect","auth_type":"code","redirect_uri":"http://localhost:9090/auth/realms/local-dev/account/login-redirect","consent":"no_consent_required","code_id":"1412873b-8830-4e83-ae46-4ca63512a3e2","username":"not_logged_on_purpose"},"authentication_session_parent_id":"1412873b-8830-4e83-ae46-4ca63512a3e2","authentication_session_tab_id":"OniFaL7lqpg"}}
+```
