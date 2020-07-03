@@ -20,18 +20,18 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 
     private final KeycloakSession session;
     private final Logger loggerLoginEvents;
-	private final Logger loggerAdminEvents;
-	private final SimpleDateFormat dateTimeFormatter;
+    private final Logger loggerAdminEvents;
+    private final SimpleDateFormat dateTimeFormatter;
 
 
-	public JsonLoggingEventListenerProvider(KeycloakSession session, Logger loggerLoginEvents, Logger loggerAdminEvents) {
+    public JsonLoggingEventListenerProvider(KeycloakSession session, Logger loggerLoginEvents, Logger loggerAdminEvents) {
         this.session = session;
-		this.loggerLoginEvents = loggerLoginEvents;
-		this.loggerAdminEvents = loggerAdminEvents;
-		
-		this.dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        this.loggerLoginEvents = loggerLoginEvents;
+        this.loggerAdminEvents = loggerAdminEvents;
+        
+        this.dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     }
-	
+    
     @Override
     public void onEvent(Event event) {
 
@@ -39,8 +39,8 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 
         sb.append(toString(event));
 
-		loggerLoginEvents.log(Logger.Level.INFO, sb.toString());
-		
+        loggerLoginEvents.log(Logger.Level.INFO, sb.toString());
+        
     }
 
     @Override
@@ -50,57 +50,57 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 
         sb.append(toString(adminEvent));
 
-		loggerAdminEvents.log(Logger.Level.INFO, sb.toString());
+        loggerAdminEvents.log(Logger.Level.INFO, sb.toString());
     }
 
     @Override
     public void close() {
-		
+        
     }
 
     private String toString(Event event) {
-		
-		JsonObjectBuilder obj = Json.createObjectBuilder();
-		
-		obj.add("category", "LOGIN_EVENT");
-		
+        
+        JsonObjectBuilder obj = Json.createObjectBuilder();
+        
+        obj.add("category", "LOGIN_EVENT");
+        
         obj.add("date_time_epoch", event.getTime());
-		
-		obj.add("date_time", dateTimeFormatter.format(new java.util.Date(event.getTime())));
-		
-		JsonObjectBuilder objActorUser = Json.createObjectBuilder();
-		objActorUser.add("role", "owner");
-		String userId = "";
-		String userName = "";
-		if (event.getUserId() != null) {
+        
+        obj.add("date_time", dateTimeFormatter.format(new java.util.Date(event.getTime())));
+        
+        JsonObjectBuilder objActorUser = Json.createObjectBuilder();
+        objActorUser.add("role", "owner");
+        String userId = "";
+        String userName = "";
+        if (event.getUserId() != null) {
             userId = event.getUserId().toString();
-			userName = "not_logged_on_purpose";
-		}
+            userName = "not_logged_on_purpose";
+        }
         objActorUser.add("user_id", userId);
-		objActorUser.add("user_name", userName);
-		String realm = "";
-		if (event.getRealmId() != null)
-			realm = event.getRealmId();
-		objActorUser.add("realm", realm);
-		obj.add("actor_user", objActorUser.build());
-		
-		JsonObjectBuilder objTargetUser = Json.createObjectBuilder();
-		userId = "";
-		if (event.getUserId() != null) {
+        objActorUser.add("user_name", userName);
+        String realm = "";
+        if (event.getRealmId() != null)
+            realm = event.getRealmId();
+        objActorUser.add("realm", realm);
+        obj.add("actor_user", objActorUser.build());
+        
+        JsonObjectBuilder objTargetUser = Json.createObjectBuilder();
+        userId = "";
+        if (event.getUserId() != null) {
             userId = event.getUserId().toString();
-			userName = "not_logged_on_purpose";
-		}
+            userName = "not_logged_on_purpose";
+        }
         objTargetUser.add("user_id", userId);
-		objTargetUser.add("user_name", userName);
-		realm = "";
-		if (event.getRealmId() != null)
-			realm = event.getRealmId();
-		objTargetUser.add("realm", realm);
-		obj.add("target_user", objTargetUser.build());
-		
-		if (event.getType() != null) {
-			obj.add("type", event.getType().toString());
-		}
+        objTargetUser.add("user_name", userName);
+        realm = "";
+        if (event.getRealmId() != null)
+            realm = event.getRealmId();
+        objTargetUser.add("realm", realm);
+        obj.add("target_user", objTargetUser.build());
+        
+        if (event.getType() != null) {
+            obj.add("type", event.getType().toString());
+        }
 
         if (event.getRealmId() != null) {
             obj.add("realm", event.getRealmId().toString());
@@ -117,8 +117,8 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
         if (event.getIpAddress() != null) {
             obj.add("ip_address", event.getIpAddress().toString());
         }
-		
-		 if (event.getSessionId() != null) {
+        
+         if (event.getSessionId() != null) {
             obj.add("session_id", event.getSessionId().toString());
         }
 
@@ -127,28 +127,28 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
         }
 
         if (event.getDetails() != null) {
-			JsonObjectBuilder objDetails  = Json.createObjectBuilder();
+            JsonObjectBuilder objDetails  = Json.createObjectBuilder();
             for (Map.Entry<String, String> e : event.getDetails().entrySet()) {
-				
-				// Because of GDPR, we may not want to log username (=email) to Centralized audit log (Elastic cloud)
-				if (e.getKey() == "username" || e.getKey() == "identity_provider_identity")
-					objDetails.add(e.getKey(), "not_logged_on_purpose");
-				else
-					objDetails.add(e.getKey(), e.getValue().toString());
+                
+                // Because of GDPR, we may not want to log username (=email) to Centralized audit log (Elastic cloud)
+                if (e.getKey() == "username" || e.getKey() == "identity_provider_identity")
+                    objDetails.add(e.getKey(), "not_logged_on_purpose");
+                else
+                    objDetails.add(e.getKey(), e.getValue().toString());
             }
-			obj.add("details", objDetails.build());
+            obj.add("details", objDetails.build());
         }
-		
-		AuthenticationSessionModel authSession = session.getContext().getAuthenticationSession(); 
+        
+        AuthenticationSessionModel authSession = session.getContext().getAuthenticationSession(); 
         if(authSession!=null) {
-			obj.add("authentication_session_parent_id", authSession.getParentSession().getId());
+            obj.add("authentication_session_parent_id", authSession.getParentSession().getId());
             obj.add("authentication_session_tab_id", authSession.getTabId());
         }
-		
-		//setKeycloakContext(obj);
-		
-		JsonObjectBuilder objRoot = Json.createObjectBuilder();
-		
+        
+        //setKeycloakContext(obj);
+        
+        JsonObjectBuilder objRoot = Json.createObjectBuilder();
+        
         return objRoot.add("keycloak_event", obj.build()).build().toString();
 
     }
@@ -156,49 +156,49 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
 
     private String toString(AdminEvent adminEvent) {
 
-		JsonObjectBuilder obj = Json.createObjectBuilder();
-		
-		if (adminEvent.getResourcePath() != null && adminEvent.getResourcePath().startsWith("users/"))
-			obj.add("category", "ADMIN_EVENT_USER"); // Keycloak admin event whose target is a user
-		else
-			obj.add("category", "ADMIN_EVENT_OTHER");  // Keycloak admin event whose target is not a user
-		
+        JsonObjectBuilder obj = Json.createObjectBuilder();
+        
+        if (adminEvent.getResourcePath() != null && adminEvent.getResourcePath().startsWith("users/"))
+            obj.add("category", "ADMIN_EVENT_USER"); // Keycloak admin event whose target is a user
+        else
+            obj.add("category", "ADMIN_EVENT_OTHER");  // Keycloak admin event whose target is not a user
+        
         obj.add("date_time_epoch", adminEvent.getTime());
-		obj.add("date_time", dateTimeFormatter.format(new java.util.Date(adminEvent.getTime())));
-		
-		JsonObjectBuilder objActorUser = Json.createObjectBuilder();
-		objActorUser.add("role", "admin");
-		String userId = "";
-		String userName = "";
-		if (adminEvent.getAuthDetails().getUserId() != null) {
+        obj.add("date_time", dateTimeFormatter.format(new java.util.Date(adminEvent.getTime())));
+        
+        JsonObjectBuilder objActorUser = Json.createObjectBuilder();
+        objActorUser.add("role", "admin");
+        String userId = "";
+        String userName = "";
+        if (adminEvent.getAuthDetails().getUserId() != null) {
             userId = adminEvent.getAuthDetails().getUserId().toString();
-			userName = "not_logged_on_purpose";
-		}
+            userName = "not_logged_on_purpose";
+        }
         objActorUser.add("user_id", userId);
-		objActorUser.add("user_name", userName);
-		String realm = "";
-		if (adminEvent.getAuthDetails().getRealmId() != null)
-			realm = adminEvent.getAuthDetails().getRealmId();
-		objActorUser.add("realm", realm);
-		obj.add("actor_user", objActorUser.build());
-		
-		JsonObjectBuilder objTargetUser = Json.createObjectBuilder();
-		userId = "";
-		userName = "";
-		if (adminEvent.getResourcePath() != null && adminEvent.getResourcePath().startsWith("users/")) { 
-			 try {
-				 String[] resourcePathSplit = adminEvent.getResourcePath().split("/");
-				 userId = resourcePathSplit[1];
-				 userName = "not_logged_on_purpose";
-			 } catch (Exception e) {}
-		}
+        objActorUser.add("user_name", userName);
+        String realm = "";
+        if (adminEvent.getAuthDetails().getRealmId() != null)
+            realm = adminEvent.getAuthDetails().getRealmId();
+        objActorUser.add("realm", realm);
+        obj.add("actor_user", objActorUser.build());
+        
+        JsonObjectBuilder objTargetUser = Json.createObjectBuilder();
+        userId = "";
+        userName = "";
+        if (adminEvent.getResourcePath() != null && adminEvent.getResourcePath().startsWith("users/")) { 
+             try {
+                 String[] resourcePathSplit = adminEvent.getResourcePath().split("/");
+                 userId = resourcePathSplit[1];
+                 userName = "not_logged_on_purpose";
+             } catch (Exception e) {}
+        }
         objTargetUser.add("user_id", userId);
-		objTargetUser.add("user_name", userName);
-		realm = "";
-		if (adminEvent.getRealmId() != null)
-			realm =  adminEvent.getRealmId();
-		objTargetUser.add("realm", realm);
-		obj.add("target_user", objTargetUser.build());
+        objTargetUser.add("user_name", userName);
+        realm = "";
+        if (adminEvent.getRealmId() != null)
+            realm =  adminEvent.getRealmId();
+        objTargetUser.add("realm", realm);
+        obj.add("target_user", objTargetUser.build());
 
         obj.add("type", "ADMIN_EVENT");
 
@@ -207,9 +207,9 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
         }
 
         if (adminEvent.getAuthDetails() != null) {
-			
-			JsonObjectBuilder objAuthDetails =  Json.createObjectBuilder();
-			
+            
+            JsonObjectBuilder objAuthDetails =  Json.createObjectBuilder();
+            
             if (adminEvent.getAuthDetails().getRealmId() != null) {
                 objAuthDetails.add("realm", adminEvent.getAuthDetails().getRealmId().toString());
             }
@@ -225,8 +225,8 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
             if (adminEvent.getAuthDetails().getIpAddress() != null) {
                 objAuthDetails.add("ip_address", adminEvent.getAuthDetails().getIpAddress().toString());
             }
-			
-			obj.add("auth_details", objAuthDetails.build());
+            
+            obj.add("auth_details", objAuthDetails.build());
 
         }
 
@@ -237,36 +237,36 @@ public class JsonLoggingEventListenerProvider implements EventListenerProvider {
         if (adminEvent.getResourcePath() != null) {
             obj.add("resource_path", adminEvent.getResourcePath().toString());
         }
-		
-		if (adminEvent.getRealmId() != null) {
+        
+        if (adminEvent.getRealmId() != null) {
             obj.add("resource_realm", adminEvent.getRealmId().toString());
         }
 
         if (adminEvent.getError() != null) {
             obj.add("error", adminEvent.getError().toString());
         }
-		
-		//setKeycloakContext(obj);
+        
+        //setKeycloakContext(obj);
 
-		JsonObjectBuilder objRoot = Json.createObjectBuilder();
-		
+        JsonObjectBuilder objRoot = Json.createObjectBuilder();
+        
         return objRoot.add("keycloak_event", obj.build()).build().toString();
     }
-	
-	private void setKeycloakContext(JsonObjectBuilder obj) {
+    
+    private void setKeycloakContext(JsonObjectBuilder obj) {
         KeycloakContext context = session.getContext();
         UriInfo uriInfo = context.getUri();
         HttpHeaders headers = context.getRequestHeaders();
         if (uriInfo != null) {
-			obj.add("request_uri", uriInfo.getRequestUri().toString());
+            obj.add("request_uri", uriInfo.getRequestUri().toString());
         }
 
-        if (headers != null) {		
-			JsonArrayBuilder cookieArray = Json.createArrayBuilder();
+        if (headers != null) {        
+            JsonArrayBuilder cookieArray = Json.createArrayBuilder();
             for (Map.Entry<String, Cookie> e : headers.getCookies().entrySet()) {
                 cookieArray.add(e.getValue().toString());
-            }	
-			obj.add("cookies", cookieArray.build());
+            }    
+            obj.add("cookies", cookieArray.build());
         }  
     }
 

@@ -12,13 +12,13 @@ import org.keycloak.models.KeycloakSessionFactory;
 public class JsonLoggingEventListenerProviderFactory implements EventListenerProviderFactory {
 
     private static final Logger loggerLoginEvents = Logger.getLogger("org.keycloak.events.Event");
-	private static final Logger loggerAdminEvents = Logger.getLogger("org.keycloak.events.admin.AdminEvent");
+    private static final Logger loggerAdminEvents = Logger.getLogger("org.keycloak.events.admin.AdminEvent");
 
 
     @Override
     public EventListenerProvider create(KeycloakSession session) {
 
-		return new JsonLoggingEventListenerProvider(session, loggerLoginEvents, loggerAdminEvents);
+        return new JsonLoggingEventListenerProvider(session, loggerLoginEvents, loggerAdminEvents);
     }
 
     @Override
